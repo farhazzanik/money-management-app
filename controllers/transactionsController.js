@@ -3,8 +3,8 @@ const {serverError , resourceError} = require('../util/error')
 const User = require('../model/User')
 
 module.exports =  {
-    create (res , req) {
-        let {amount , type , note} = req.body
+    create (req , res) {
+        let { amount , type , note } = req.body
         let userId = req.user._id
 
         let transcation = new TransactionsModel({
@@ -12,22 +12,28 @@ module.exports =  {
         })
 
         transcation.save()
-        .then(transcation => {
-            let updateUser = { ... req.user }
-            if(type === 'income'){
+        .then(trans => {
+            let updateUser = { ... req.user._doc }
+            if(type === "income"){
                 updateUser.blance = updateUser.blance + amount
                 updateUser.income = updateUser.income + amount
-            }else {
+            }else if(type === "expense"){
                 updateUser.blance = updateUser.blance - amount
                 updateUser.expense = updateUser.expense + amount
             }
-            updateUser.transactions.unshif(transcation._id)
-            User.findByIdAndUpdate(updateUser._id , {$set : updateUser})
+           
+            updateUser.transactions.unshift(trans._id)
+            User.findByIdAndUpdate(updateUser._id , {$set : updateUser},{new : true})
+                .then(result => {
+                    res.status(201).json({
+                        message : "Transaction Created Successfully",
+                        ... trans._doc,
+                        user : result
+                    })
+                })
+                .catch(error => serverError(res , error))
 
-            res.status(201).json({
-                message : "Transaction Created Successfully"
-                ... transcation
-            })
+         
             
         })
         .catch( error => serverError(res , error) )
@@ -42,7 +48,7 @@ module.exports =  {
                 res.status(200).json(transactions)
              }
          })
-         .error(error =>  serverError(res , error))
+         .catch(error =>  serverError(res , error))
     },
 
     getSingleTransaction(req , res) {

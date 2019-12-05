@@ -13,7 +13,7 @@ const TransactionsSchema = new Schema({
         required : true
     },
 
-    note : Text,
+    note : String,
     author : {
         type : Schema.Types.ObjectId,
         ref : 'User'

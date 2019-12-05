@@ -75,7 +75,10 @@ module.exports = {
                 let userCreat = new User({
                     name : name,
                     email : email,
-                    password : hash
+                    password : hash,
+                    blance : 0,
+                    income : 0,
+                    expense : 0
                 })
 
                userCreat.save()
@@ -91,5 +94,13 @@ module.exports = {
             .catch( error => serverError(res , error))
 
         }
+    },
+
+    allUser : (req ,  res) => {
+        User.find()
+            .then( user => {
+                res.status(200).json(user)
+            })
+            .catch(error => serverError(res , error))
     }
 }

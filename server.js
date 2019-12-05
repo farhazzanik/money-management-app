@@ -4,6 +4,7 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose');
 const jsonServer = require('json-server')
+const passport = require('passport')
 
 
 
@@ -15,10 +16,12 @@ app.use(cors())
 app.use(bodyParser.urlencoded({ extended : false }))
 app.use(bodyParser.json())
 app.use(jsonServer.defaults())
+app.use(passport.initialize())
+require('./passport')(passport)
 
 
 app.use('/api/users' , require('./routers/userRoute'))
-app.use('/api/users' , require('./routers/transactionRoute'))
+app.use('/api/transactions' , require('./routers/transactionRoute'))
 
 
 app.get('/', (req, res) => {
