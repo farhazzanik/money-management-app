@@ -5,7 +5,7 @@ const bodyParser = require('body-parser')
 const mongoose = require('mongoose');
 const jsonServer = require('json-server')
 
-const userRouter = require('./routers/userRoute')
+
 
 const app = express()
 app.use(morgan('dev'))
@@ -17,7 +17,8 @@ app.use(bodyParser.json())
 app.use(jsonServer.defaults())
 
 
-app.use('/api/users' , userRouter)
+app.use('/api/users' , require('./routers/userRoute'))
+app.use('/api/users' , require('./routers/transactionRoute'))
 
 
 app.get('/', (req, res) => {

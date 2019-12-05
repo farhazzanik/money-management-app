@@ -1,27 +1,39 @@
 import React,{Component} from 'react';
 import {Link} from 'react-router-dom'
+import InputLabel from './formData/InputLabel'
+import {connect} from 'react-redux'
+import {login} from '../store/actions/authAction'
 
 class Login extends Component {
     state = {
-      
         email : '',
         password : '',
         error : {}
-    }
+     }
 
     changeHandler = event => {
         this.setState ({
-            [event.target.name] : [event.target.value]
+            [event.target.name] : event.target.value
         })
     }
 
+    static getDerivedStateFromProps(nextProps , preState){
+        if(JSON.stringify(nextProps.auth.error) !== JSON.stringify(preState.error)){
+            return {
+                error : nextProps.auth.error
+            }
+        }
+        return null
+    }
 
     submitHandler = event => {
         event.preventDefault()
+        let {email , password} = this.state
+        this.props.login({email,password} , this.props.history)
     }
 
     render(){
-        let {name , email , password, confirmPassword} = this.state
+        let { email , password, error } = this.state
         
         return(
           
@@ -31,37 +43,36 @@ class Login extends Component {
                         <h1 className="text-center display-4">Login Here</h1>
                         <form onSubmit = {this.submitHandler}>
                            
+                            
+                            <InputLabel 
+                                label="Email : " 
+                                htmlFor="email" 
+                                type="email" 
+                                placeholder="E-mail" 
+                                feedback = {error.email ? error.email : null}
+                                className = { error.email ? 'form-control is-invalid' : 'form-control'}
+                                name="email" 
+                                id="email" 
+                                value={email} 
+                                changeHandler = {this.changeHandler} />
+                                
 
-                            <div className="form-group">
-                                <label htmlFor="email">Email : </label>
-                                <input 
-                                    type="eamil"
-                                    className="form-control"
-                                    placeholder="Enter your email"
-                                    name="email"
-                                    id = "email"
-                                    value = {email}
-                                    onChange = {this.changeHandler}
-                                />
-                            </div>
 
-
-                            <div className="form-group">
-                                <label htmlFor="password">Password</label>
-                                <input 
-                                    type="password"
-                                    className="form-control"
-                                    placeholder="Enter your password"
-                                    name="password"
-                                    id = "password"
-                                    value = {password}
-                                    onChange = {this.changeHandler}
-                                />
-                            </div>
+                            <InputLabel 
+                                label="Password : " 
+                                htmlFor="password" 
+                                type="password"
+                                feedback = {error.password ? error.password : null}
+                                placeholder="Password" 
+                                className = { error.password ? 'form-control is-invalid' : 'form-control'}
+                                name="password" 
+                                id="password" 
+                                value={password} 
+                                changeHandler = {this.changeHandler} />
 
 
                             <Link to = '/register'>Do not have account register here..</Link>
-                            <button className="btn btn-primary d-block my-4"> Register </button>
+                            <button className="btn btn-primary d-block my-4"> Login </button>
 
                         </form>
                     </div>
@@ -71,5 +82,9 @@ class Login extends Component {
     }
 }
 
+const mapStateToProps = state => ({
+    
+        auth : state.auth
+    })
 
-export default Login
+export default connect(mapStateToProps , {login})(Login)

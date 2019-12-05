@@ -34,7 +34,11 @@ module.exports = {
                    let token = jwt.sign({
                        _id : user.id,
                        name : user.name,
-                       email :  user.email
+                       email :  user.email,
+                       blance : user.blance,
+                       income : user.income,
+                       expense : user.expense,
+                       transactions : user.transactions
                    }, 'SECRET', {expiresIn : '2h'})
 
                    res.status(200).json({
@@ -54,7 +58,6 @@ module.exports = {
     register : (req , res) => {
         let {name , email , password , confirmPassword} = req.body
         let validator = registerValidator( { name , email , password , confirmPassword } )
-
         if(!validator.isValid){
            return res.status(400).json(validator.error)
            
@@ -70,8 +73,8 @@ module.exports = {
                 var hash = bcrypt.hashSync(password, 11);
 
                 let userCreat = new User({
-                    name,
-                    email,
+                    name : name,
+                    email : email,
                     password : hash
                 })
 
@@ -82,10 +85,10 @@ module.exports = {
                         user
                     })
                 })
-                .catch( e =>  serverError(res , err))
+                .catch( error =>  serverError(res , error))
 
             })
-            .catch( e => serverError(res , err))
+            .catch( error => serverError(res , error))
 
         }
     }
